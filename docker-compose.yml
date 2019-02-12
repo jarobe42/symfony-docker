@@ -1,7 +1,12 @@
 version: '2'
 
 services:
-
+  nginx-proxy:
+    image: jwilder/nginx-proxy
+    ports:
+      - "80:80"
+    volumes:
+      - /var/run/docker.sock:/tmp/docker.sock:ro
   app:
     container_name: sf.app
     build: .docker/php
@@ -9,11 +14,12 @@ services:
       - .:/app
       - ./var/logs:/app/var/logs
       - ./var/cache.:/app/var/cache
-
   nginx:
     container_name: sf.nginx
     build: .docker/nginx
-    volumes_from:
-      - app
     ports:
       - "81:80"
+    environment:
+      - VIRTUAL_HOST=symfony-dev.local
+    volumes_from:
+      - app
